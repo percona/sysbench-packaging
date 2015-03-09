@@ -60,7 +60,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc ChangeLog COPYING  README
+%doc ChangeLog COPYING  README.md
 %doc %{_docdir}/sysbench/tests/db
 %{_bindir}/*
 
