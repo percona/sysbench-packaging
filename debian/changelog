@@ -1,0 +1,18 @@
+sysbench (0.5-3) unstable; urgency=low
+
+  * Sysbench 0.5 revision 128 
+
+ -- Tomislav Plavcic <tomislav.plavcic@percona.com>  Wed, 19 Nov 2014 10:14:07 +0100
+
+sysbench (0.5-2) unstable; urgency=low
+
+  * Sysbench 0.5 revision 126
+
+ -- Tomislav Plavcic <tomislav.plavcic@percona.com>  Tue, 21 Oct 2014 11:29:16 +0000
+
+sysbench (0.5-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Tomislav Plavcic <tomislav.plavcic@percona.com>  Mon, 01 Sep 2014 15:33:22 +0200
+
