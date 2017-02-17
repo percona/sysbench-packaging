@@ -13,7 +13,6 @@ BuildRequires: libaio-devel
 BuildRequires: automake
 BuildRequires: libtool
 
-
 %description
 SysBench is a modular, cross-platform and multi-threaded benchmark
 tool for evaluating OS parameters that are important for a system
@@ -33,39 +32,37 @@ Primarily written for MySQL server benchmarking, SysBench will be
 further extended to support multiple database backends, distributed
 benchmarks and third-party plug-in modules.
 
-
 %prep
 %setup -q
-
 
 %build
 touch NEWS AUTHORS
 autoreconf -vif
-#%configure --with-mysql 
+#%configure --with-mysql
 
 make
-
 
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
-mkdir -p  $RPM_BUILD_ROOT%{_docdir}/sysbench/tests/db
-cp -r sysbench/tests/db/*.lua $RPM_BUILD_ROOT%{_docdir}/sysbench/tests/db
 rm -f $RPM_BUILD_ROOT%{_docdir}/sysbench/manual.html
-
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-
 %files
 %defattr(-,root,root,-)
 %doc ChangeLog COPYING  README.md
-%doc %{_docdir}/sysbench/tests/db
+%dir %{_docdir}
+%dir %{_datadir}/sysbench
+%{_datadir}/sysbench/*
 %{_bindir}/*
 
 
 %changelog
+* Fri Feb 17 2017 Alexey Bychko <alexey.bychko@percona.com> 1.0.1-1
+- Build new version 1.0.1
+
 * Wed Nov 19 2014 Tomislav Plavcic <tomislav.plavcic@percona.com> 0.5-6
 - Build from lp code rev 128
 
@@ -96,7 +93,7 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Dec 24 2010 Xavier Bachelot <xavier@bachelot.org> 0.4.12-2
 - Rebuild against new mysql.
 
-* Tue Jul 07 2010 Xavier Bachelot <xavier@bachelot.org> 0.4.12-1
+* Wed Jul 07 2010 Xavier Bachelot <xavier@bachelot.org> 0.4.12-1
 - Update to 0.4.12.
 
 * Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 0.4.10-5
