@@ -11,3 +11,6 @@ override_dh_auto_configure:
 
 override_dh_compress:
 	dh_compress -X.lua
+
+override_dh_auto_test:
+	@echo "Skipping test step"
