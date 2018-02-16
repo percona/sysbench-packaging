@@ -39,7 +39,9 @@ benchmarks and third-party plug-in modules.
 touch NEWS AUTHORS
 export CFLAGS="%{optflags}"
 autoreconf -vif
-%configure --without-gcc-arch
+%configure --with-mysql \
+           --with-pgsql \
+     --without-gcc-arch
 
 make
 
