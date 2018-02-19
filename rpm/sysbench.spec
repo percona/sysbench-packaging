@@ -8,10 +8,20 @@ Source0:       %{name}-%{version}.tar.gz
 URL:           https://launchpad.net/sysbench/
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+%if 0%{?el6}
 BuildRequires: mysql-devel
-BuildRequires: libaio-devel
+%else
+BuildRequires: mariadb-devel
+%endif
+BuildRequires: postgresql-devel
+BuildRequires: make
 BuildRequires: automake
 BuildRequires: libtool
+BuildRequires: pkgconfig
+BuildRequires: libaio-devel
+# Use bundled cram for tests
+BuildRequires: python
+
 
 %description
 SysBench is a modular, cross-platform and multi-threaded benchmark
@@ -39,9 +49,15 @@ benchmarks and third-party plug-in modules.
 touch NEWS AUTHORS
 export CFLAGS="%{optflags}"
 autoreconf -vif
-%configure --without-gcc-arch
+%configure --with-mysql \
+           --with-pgsql \
+	   --without-gcc-arch
 
-make
+%if 0%{?el6}
+make -j2
+%else
+%make_build
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
