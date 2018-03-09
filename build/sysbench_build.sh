@@ -209,11 +209,11 @@ install_deps() {
     then
         add_percona_yum_repo
         yum -y install git wget
-        yum -y install epel-release rpmdevtools bison yum-builddep
+        yum -y install epel-release rpmdevtools bison yum-utils
         cd $WORKDIR
         link="https://raw.githubusercontent.com/percona/sysbench-packaging/master/rpm/sysbench.spec"
         wget $link
-        sed -i "s:@@VERSION@@:${VERSION}:g" $WORKDIR/$NAME.spec
+        sed -i "s:@@VERSION@@:${SYSBENCH_BRANCH}:g" $WORKDIR/$NAME.spec
         sed -i "s:@@RELEASE@@:${RPM_RELEASE}:g" $WORKDIR/$NAME.spec
         yum-builddep -y $WORKDIR/$NAME.spec
     else
@@ -302,7 +302,7 @@ build_srpm(){
     cd ${WORKDIR}
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     #
-    sed -i "s:@@VERSION@@:${VERSION}:g" rpmbuild/SPECS/sysbench.spec
+    sed -i "s:@@VERSION@@:${SYSBENCH_BRANCH}:g" rpmbuild/SPECS/sysbench.spec
     sed -i "s:@@RELEASE@@:${RPM_RELEASE}:g" rpmbuild/SPECS/sysbench.spec
     #
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" rpmbuild/SPECS/sysbench.spec
@@ -474,7 +474,7 @@ REVISION=0
 TPCC_REPO="https://github.com/Percona-Lab/sysbench-tpcc.git"
 NAME=sysbench
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION=$SYSBENCH_BRANCH
+SYSBENCH_VERSION=$SYSBENCH_BRANCH
 
 check_workdir
 get_system
