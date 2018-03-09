@@ -225,7 +225,7 @@ install_deps() {
         link="https://raw.githubusercontent.com/percona/sysbench-packaging/master/debian/control"
         wget $link
         cd $CURPLACE
-        sed -i 's:apt-get :apt-get -y --allow :g' /usr/bin/mk-build-deps
+        sed -i 's:apt-get :apt-get -y --force-yes :g' /usr/bin/mk-build-deps
         mk-build-deps --install $WORKDIR/control
     fi
     return;
@@ -371,7 +371,6 @@ build_source_deb(){
     fi
     rm -rf sysbench*
     get_tar "source_tarball"
-    rm -f *.dsc *.orig.tar.gz *.debian.tar.gz *.changes
     #
     TARFILE=$(basename $(find . -name 'sysbench-*.tar.gz' | sort | tail -n1))
     NAME=$(echo ${TARFILE}| awk -F '-' '{print $1}')
@@ -394,14 +393,15 @@ build_source_deb(){
     dpkg-buildpackage -S
     #
     cd ../
+    ls
     mkdir -p $WORKDIR/source_deb
     mkdir -p $CURDIR/source_deb
     cp *_source.changes $WORKDIR/source_deb
     cp *.dsc $WORKDIR/source_deb
-    cp *.orig.tar.gz $WORKDIR/source_deb
+    cp *.tar.gz $WORKDIR/source_deb
     cp *_source.changes $CURDIR/source_deb
     cp *.dsc $CURDIR/source_deb
-    cp *.orig.tar.gz $CURDIR/source_deb
+    cp *.tar.gz $CURDIR/source_deb
 }
 
 build_deb(){
@@ -415,7 +415,7 @@ build_deb(){
         echo "It is not possible to build source deb here"
         exit 1
     fi
-    for file in 'dsc' 'orig.tar.gz' 'changes'
+    for file in 'dsc' 'orig.tar.gz' 'changes' 'debian.tar.gz'
     do
         get_deb_sources $file
     done
@@ -474,7 +474,7 @@ REVISION=0
 TPCC_REPO="https://github.com/Percona-Lab/sysbench-tpcc.git"
 NAME=sysbench
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-SYSBENCH_VERSION=$SYSBENCH_BRANCH
+VERSION=$SYSBENCH_BRANCH
 
 check_workdir
 get_system
