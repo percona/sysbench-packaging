@@ -14,3 +14,12 @@ override_dh_compress:
 
 override_dh_auto_test:
 	@echo "Skipping test step"
+
+override_dh_auto_install:
+	dh_auto_install
+	ls debian
+	cp tpcc/tpcc.lua debian/sysbench/usr/bin/tpcc.lua
+	cp tpcc/tpcc_check.lua debian/sysbench/usr/bin/tpcc_check.lua
+	cp tpcc/tpcc_common.lua debian/sysbench/usr/bin/tpcc_common.lua
+	cp tpcc/tpcc_run.lua debian/sysbench/usr/bin/tpcc_run.lua
+        

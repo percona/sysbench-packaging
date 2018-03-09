@@ -63,6 +63,10 @@ make -j2
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{_docdir}/sysbench/manual.html
+install -m 0755 tpcc/tpcc.lua $RPM_BUILD_ROOT/%{_bindir}/
+install -m 0755 tpcc/tpcc_check.lua $RPM_BUILD_ROOT/%{_bindir}/
+install -m 0755 tpcc/tpcc_common.lua $RPM_BUILD_ROOT/%{_bindir}/
+install -m 0755 tpcc/tpcc_run.lua $RPM_BUILD_ROOT/%{_bindir}/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
