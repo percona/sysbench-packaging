@@ -29,3 +29,8 @@ Description: Cross-platform and multi-threaded benchmark tool
  Primarily written for MySQL server benchmarking, SysBench will be further
  extended to support multiple database backends, distributed benchmarks and
  third-party plug-in modules.
+
+Package: sysbench-tpcc
+Architecture: any
+Depends: sysbench, ${shlibs:Depends}, ${misc:Depends}
+Description: TPCC tests files for sysbench

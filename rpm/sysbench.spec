@@ -42,6 +42,14 @@ Primarily written for MySQL server benchmarking, SysBench will be
 further extended to support multiple database backends, distributed
 benchmarks and third-party plug-in modules.
 
+%package -n sysbench-tpcc
+Group:         Applications/System
+Summary:       TPC-C benchmark based on sysbench
+Requires:      sysbench
+%description -n sysbench-tpcc
+This benchmark script was not validated and certified by the TPC organization. The results obtained can’t be named as TPC-C results, and the results are not comparable with any official TPC-C results: http://www.tpc.org/information/results_spreadsheet.asp
+
+
 %prep
 %setup -q
 
@@ -71,13 +79,18 @@ install -m 0755 tpcc/tpcc_run.lua $RPM_BUILD_ROOT/%{_bindir}/
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+
 %files
 %defattr(-,root,root,-)
 %doc ChangeLog COPYING  README.md
 %dir %{_docdir}
 %dir %{_datadir}/sysbench
 %{_datadir}/sysbench/*
-%{_bindir}/*
+%{_bindir}/sysbench
+
+
+%files -n sysbench-tpcc
+%{_bindir}/tpcc*
 
 
 %changelog
