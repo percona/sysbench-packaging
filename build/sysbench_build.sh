@@ -219,7 +219,7 @@ install_deps() {
     else
         add_percona_apt_repo
         apt-get update
-        apt-get -y install devscripts equivs libmysqlclient-dev libpq-dev pkg-config
+        apt-get -y install fakeroot debhelper debconf devscripts equivs libmysqlclient-dev libpq-dev pkg-config
         CURPLACE=$(pwd)
         cd $WORKDIR
         link="https://raw.githubusercontent.com/percona/sysbench-packaging/master/debian/control"
