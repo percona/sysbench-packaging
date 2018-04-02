@@ -45,7 +45,7 @@ benchmarks and third-party plug-in modules.
 %package -n sysbench-tpcc
 Group:         Applications/System
 Summary:       TPC-C benchmark based on sysbench
-Requires:      sysbench
+Requires:      sysbench > 1.0.0
 %description -n sysbench-tpcc
 This benchmark script was not validated and certified by the TPC organization. The results obtained can’t be named as TPC-C results, and the results are not comparable with any official TPC-C results: http://www.tpc.org/information/results_spreadsheet.asp
 
