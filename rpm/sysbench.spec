@@ -45,7 +45,7 @@ benchmarks and third-party plug-in modules.
 %package -n sysbench-tpcc
 Group:         Applications/System
 Summary:       TPC-C benchmark based on sysbench
-Requires:      sysbench > 1.0.0
+Requires(pre):      sysbench > 1.0.0
 %description -n sysbench-tpcc
 This benchmark script was not validated and certified by the TPC organization. The results obtained can’t be named as TPC-C results, and the results are not comparable with any official TPC-C results: http://www.tpc.org/information/results_spreadsheet.asp
 
@@ -71,14 +71,17 @@ make -j2
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{_docdir}/sysbench/manual.html
-install -m 0755 tpcc/tpcc.lua $RPM_BUILD_ROOT/%{_bindir}/
-install -m 0755 tpcc/tpcc_check.lua $RPM_BUILD_ROOT/%{_bindir}/
-install -m 0755 tpcc/tpcc_common.lua $RPM_BUILD_ROOT/%{_bindir}/
-install -m 0755 tpcc/tpcc_run.lua $RPM_BUILD_ROOT/%{_bindir}/
+install -d $RPM_BUILD_ROOT/usr/share/sysbench
+install -m 0755 tpcc/tpcc.lua $RPM_BUILD_ROOT/%{_datadir}/sysbench/
+install -m 0755 tpcc/tpcc_check.lua $RPM_BUILD_ROOT/%{_datadir}/sysbench/
+install -m 0755 tpcc/tpcc_common.lua $RPM_BUILD_ROOT/%{_datadir}/sysbench/
+install -m 0755 tpcc/tpcc_run.lua $RPM_BUILD_ROOT/%{_datadir}/sysbench/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%files -n sysbench-tpcc
+%{_datadir}/sysbench/tpcc*
 
 %files
 %defattr(-,root,root,-)
@@ -89,8 +92,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/sysbench
 
 
-%files -n sysbench-tpcc
-%{_bindir}/tpcc*
 
 
 %changelog

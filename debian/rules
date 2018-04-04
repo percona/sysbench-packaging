@@ -17,8 +17,8 @@ override_dh_auto_test:
 
 override_dh_auto_install:
 	dh_auto_install
-	cp tpcc/tpcc.lua debian/tmp/usr/bin/tpcc.lua
-	cp tpcc/tpcc_check.lua debian/tmp/usr/bin/tpcc_check.lua
-	cp tpcc/tpcc_common.lua debian/tmp/usr/bin/tpcc_common.lua
-	cp tpcc/tpcc_run.lua debian/tmp/usr/bin/tpcc_run.lua
+	cp tpcc/tpcc.lua debian/tmp/tpcc.lua
+	cp tpcc/tpcc_check.lua debian/tmp/tpcc_check.lua
+	cp tpcc/tpcc_common.lua debian/tmp/tpcc_common.lua
+	cp tpcc/tpcc_run.lua debian/tmp/tpcc_run.lua
         

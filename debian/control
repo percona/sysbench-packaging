@@ -32,5 +32,6 @@ Description: Cross-platform and multi-threaded benchmark tool
 
 Package: sysbench-tpcc
 Architecture: any
-Depends: sysbench (>= 1.0.0), ${shlibs:Depends}, ${misc:Depends}
+Pre-Depends: sysbench (>= 1.0.0)
+Depends:  ${shlibs:Depends}, ${misc:Depends}
 Description: TPCC tests files for sysbench
