@@ -2,7 +2,7 @@ Source: sysbench
 Section: misc
 Priority: extra
 Maintainer: Percona Development Team <mysql-dev@percona.com>
-Build-Depends: debhelper, autoconf, automake, libtool, libmysqlclient-dev | default-libmysqlclient-dev, libpq-dev, pkg-config, python
+Build-Depends: debhelper, autoconf, automake, libtool, libaio-dev, libmysqlclient-dev | default-libmysqlclient-dev, libpq-dev, pkg-config, python
 Standards-Version: 3.9.5
 Homepage: https://github.com/akopytov/sysbench
 
