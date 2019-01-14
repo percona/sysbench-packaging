@@ -1,0 +1,80 @@
+--- sysbench.spec       2019-01-14 11:05:11.607168441 +0200
++++ /home/korvin/sys/sysbench-packaging/rpm/sysbench.spec       2019-01-14 10:00:26.006847376 +0200
+@@ -1,12 +1,12 @@
+ Summary:       Scriptable database and system performance benchmark
+ Name:          sysbench
+-# Version will be replaced by packpack
+-Version:       x.y.z
+-Release:       1%{?dist}
++Version:       @@VERSION@@
++Release:       @@RELEASE@@%{?dist}
+ License:       GPLv2+
+ Group:         Applications/System
+-Source0:       https://github.com/akopytov/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
++Source0:       %{name}-%{version}.tar.gz
+ URL:           https://github.com/akopytov/sysbench/
++BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+ 
+ %if 0%{?el6}
+ BuildRequires: mysql-devel
+@@ -22,8 +22,6 @@
+ # Use bundled cram for tests
+ BuildRequires: python
+ 
+-ExclusiveArch: %{arm} %{ix86} x86_64 %{mips} aarch64
+-
+ 
+ %description
+ sysbench is a scriptable multi-threaded benchmark tool based on
+@@ -40,6 +38,14 @@
+ - threads: a thread-based scheduler benchmark
+ - mutex: a POSIX mutex benchmark
+ 
++%package -n sysbench-tpcc
++Group:         Applications/System
++Summary:       TPC-C benchmark based on sysbench
++Requires(pre):      sysbench > 1.0.0
++%description -n sysbench-tpcc
++This benchmark script was not validated and certified by the TPC organization. The results obtained can’t be named as TPC-C results, and the results are not comparable with any official TPC-C results: http://www.tpc.org/information/results_spreadsheet.asp
++
++
+ %prep
+ %setup -q
+ 
+@@ -57,20 +63,27 @@
+ %endif
+ 
+ %install
++rm -rf $RPM_BUILD_ROOT
+ %make_install
+ rm -f %{buildroot}%{_docdir}/sysbench/manual.html
++install -d $RPM_BUILD_ROOT/usr/share/sysbench
++install -m 0755 tpcc/tpcc.lua $RPM_BUILD_ROOT/%{_datadir}/sysbench/
++install -m 0755 tpcc/tpcc_check.lua $RPM_BUILD_ROOT/%{_datadir}/sysbench/
++install -m 0755 tpcc/tpcc_common.lua $RPM_BUILD_ROOT/%{_datadir}/sysbench/
++install -m 0755 tpcc/tpcc_run.lua $RPM_BUILD_ROOT/%{_datadir}/sysbench/
+ 
+-%check
+-make test
+ 
+ %files
+-%doc ChangeLog COPYING README.md
+-%if 0%{?el6}
+-%else
+-%license COPYING
+-%endif
+-%{_bindir}/*
+-%{_datadir}/%{name}
++%defattr(-,root,root,-)
++%doc ChangeLog COPYING  README.md
++%dir %{_docdir}
++%dir %{_datadir}/sysbench
++%{_datadir}/sysbench/*
++%{_bindir}/sysbench
++
++
++%files -n sysbench-tpcc
++%{_datadir}/sysbench/tpcc*
+ 
+ 
+ %changelog

@@ -1,4 +1,0 @@
-tpcc.lua /usr/share/sysbench/
-tpcc_check.lua /usr/share/sysbench/
-tpcc_common.lua /usr/share/sysbench/
-tpcc_run.lua /usr/share/sysbench/

@@ -211,10 +211,9 @@ install_deps() {
         yum -y install git wget
         yum -y install epel-release rpmdevtools bison yum-utils
         cd $WORKDIR
-        link="https://raw.githubusercontent.com/percona/sysbench-packaging/master/rpm/sysbench.spec"
+        link="https://raw.githubusercontent.com/akopytov/sysbench/master/rpm/sysbench.spec"
         wget $link
-        sed -i "s:@@VERSION@@:${SYSBENCH_BRANCH}:g" $WORKDIR/$NAME.spec
-        sed -i "s:@@RELEASE@@:${RPM_RELEASE}:g" $WORKDIR/$NAME.spec
+        sed -i 's|x.y.z|1.0|' sysbench.spec
         yum-builddep -y $WORKDIR/$NAME.spec
     else
         add_percona_apt_repo
@@ -222,7 +221,7 @@ install_deps() {
         apt-get -y install fakeroot debhelper debconf devscripts equivs libmysqlclient-dev libpq-dev pkg-config
         CURPLACE=$(pwd)
         cd $WORKDIR
-        link="https://raw.githubusercontent.com/percona/sysbench-packaging/master/debian/control"
+        link="https://raw.githubusercontent.com/akopytov/sysbench/master/debian/control"
         wget $link
         cd $CURPLACE
         sed -i 's:apt-get :apt-get -y --force-yes :g' /usr/bin/mk-build-deps
@@ -297,7 +296,8 @@ build_srpm(){
     git clone https://github.com/percona/sysbench-packaging.git
     #
     cd ${WORKDIR}/rpmbuild/SPECS
-    cp -ap ${WORKDIR}/sysbench-packaging/rpm/*.spec .
+    tar vxzf ${WORKDIR}/${TARFILE} --wildcards '*/rpm/sysbench.spec' --strip=2
+    patch -p0 sysbench.spec < ${WORKDIR}/sysbench-packaging/rpm/spec.patch
     #
     cd ${WORKDIR}
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
@@ -388,7 +388,7 @@ build_source_deb(){
     #
     tar xzf ${NEWTAR}
     cd ${NAME}-${VERSION}
-    cp -ap ${WORKDIR}/sysbench-packaging/debian/ .
+    patch -p0 < ${WORKDIR}/sysbench-packaging/debian/debian.patch .
     dch -D unstable --force-distribution -v "${VERSION}-${DEB_RELEASE}" "Update to new upstream release SysBench ${VERSION}-${DEB_RELEASE}"
     dpkg-buildpackage -S
     #
