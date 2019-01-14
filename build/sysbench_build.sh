@@ -209,23 +209,22 @@ install_deps() {
     then
         add_percona_yum_repo
         yum -y install git wget
-        yum -y install epel-release rpmdevtools bison yum-builddep
+        yum -y install epel-release rpmdevtools bison yum-utils
         cd $WORKDIR
-        link="https://raw.githubusercontent.com/percona/sysbench-packaging/master/rpm/sysbench.spec"
+        link="https://raw.githubusercontent.com/akopytov/sysbench/master/rpm/sysbench.spec"
         wget $link
-        sed -i "s:@@VERSION@@:${VERSION}:g" $WORKDIR/$NAME.spec
-        sed -i "s:@@RELEASE@@:${RPM_RELEASE}:g" $WORKDIR/$NAME.spec
+        sed -i 's|x.y.z|1.0|' sysbench.spec
         yum-builddep -y $WORKDIR/$NAME.spec
     else
         add_percona_apt_repo
         apt-get update
-        apt-get -y install devscripts equivs libmysqlclient-dev libpq-dev pkg-config
+        apt-get -y install fakeroot debhelper debconf devscripts equivs libmysqlclient-dev libpq-dev pkg-config
         CURPLACE=$(pwd)
         cd $WORKDIR
-        link="https://raw.githubusercontent.com/percona/sysbench-packaging/master/debian/control"
+        link="https://raw.githubusercontent.com/akopytov/sysbench/master/debian/control"
         wget $link
         cd $CURPLACE
-        sed -i 's:apt-get :apt-get -y --allow :g' /usr/bin/mk-build-deps
+        sed -i 's:apt-get :apt-get -y --force-yes :g' /usr/bin/mk-build-deps
         mk-build-deps --install $WORKDIR/control
     fi
     return;
@@ -294,15 +293,16 @@ build_srpm(){
     #
     #bzr branch lp:~percona-core/sysbench/sysbench-packaging
     rm -rf sysbench-packaging
-    git clone https://github.com/percona/sysbench-packaging.git
+    git clone https://github.com/EvgeniyPatlan/sysbench-packaging.git
     #
     cd ${WORKDIR}/rpmbuild/SPECS
-    cp -ap ${WORKDIR}/sysbench-packaging/rpm/*.spec .
+    tar vxzf ${WORKDIR}/${TARFILE} --wildcards '*/rpm/sysbench.spec' --strip=2
+    patch -p0 sysbench.spec < ${WORKDIR}/sysbench-packaging/rpm/spec.patch
     #
     cd ${WORKDIR}
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     #
-    sed -i "s:@@VERSION@@:${VERSION}:g" rpmbuild/SPECS/sysbench.spec
+    sed -i "s:@@VERSION@@:${SYSBENCH_BRANCH}:g" rpmbuild/SPECS/sysbench.spec
     sed -i "s:@@RELEASE@@:${RPM_RELEASE}:g" rpmbuild/SPECS/sysbench.spec
     #
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" rpmbuild/SPECS/sysbench.spec
@@ -371,7 +371,6 @@ build_source_deb(){
     fi
     rm -rf sysbench*
     get_tar "source_tarball"
-    rm -f *.dsc *.orig.tar.gz *.debian.tar.gz *.changes
     #
     TARFILE=$(basename $(find . -name 'sysbench-*.tar.gz' | sort | tail -n1))
     NAME=$(echo ${TARFILE}| awk -F '-' '{print $1}')
@@ -389,19 +388,20 @@ build_source_deb(){
     #
     tar xzf ${NEWTAR}
     cd ${NAME}-${VERSION}
-    cp -ap ${WORKDIR}/sysbench-packaging/debian/ .
+    patch -p0 < ${WORKDIR}/sysbench-packaging/debian/debian.patch .
     dch -D unstable --force-distribution -v "${VERSION}-${DEB_RELEASE}" "Update to new upstream release SysBench ${VERSION}-${DEB_RELEASE}"
     dpkg-buildpackage -S
     #
     cd ../
+    ls
     mkdir -p $WORKDIR/source_deb
     mkdir -p $CURDIR/source_deb
     cp *_source.changes $WORKDIR/source_deb
     cp *.dsc $WORKDIR/source_deb
-    cp *.orig.tar.gz $WORKDIR/source_deb
+    cp *.tar.gz $WORKDIR/source_deb
     cp *_source.changes $CURDIR/source_deb
     cp *.dsc $CURDIR/source_deb
-    cp *.orig.tar.gz $CURDIR/source_deb
+    cp *.tar.gz $CURDIR/source_deb
 }
 
 build_deb(){
@@ -415,7 +415,7 @@ build_deb(){
         echo "It is not possible to build source deb here"
         exit 1
     fi
-    for file in 'dsc' 'orig.tar.gz' 'changes'
+    for file in 'dsc' 'orig.tar.gz' 'changes' 'debian.tar.gz'
     do
         get_deb_sources $file
     done
@@ -468,8 +468,8 @@ OS=
 SYSBENCH_BRANCH="master"
 TPC_BRANCH="master"
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
+RPM_RELEASE=2
+DEB_RELEASE=2
 REVISION=0
 TPCC_REPO="https://github.com/Percona-Lab/sysbench-tpcc.git"
 NAME=sysbench

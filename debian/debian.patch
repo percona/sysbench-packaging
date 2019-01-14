@@ -1,0 +1,44 @@
+--- debian/control     2019-01-14 09:38:32.598194408 +0200
++++ debian/control     2019-01-14 09:38:30.878204231 +0200
+@@ -1,7 +1,7 @@
+ Source: sysbench
+ Section: misc
+ Priority: extra
+-Maintainer: Alexey Kopytov <akopytov@gmail.com>
++Maintainer: Percona Development Team <mysql-dev@percona.com>
+ Build-Depends: debhelper, autoconf, automake, libaio-dev, libtool, libmysqlclient-dev | default-libmysqlclient-dev, libpq-dev, pkg-config, python
+ Standards-Version: 3.9.5
+ Homepage: https://github.com/akopytov/sysbench
+@@ -23,3 +23,9 @@
+  - memory: a memory access benchmark
+  - threads: a thread-based scheduler benchmark
+  - mutex: a POSIX mutex benchmark
++
++Package: sysbench-tpcc
++Architecture: any
++Pre-Depends: sysbench (>= 1.0.0)
++Depends:  ${shlibs:Depends}, ${misc:Depends}
++Description: TPCC tests files for sysbench
+--- debian/rules       2019-01-14 09:32:22.580339049 +0200
++++ debian/rules       2019-01-14 09:31:31.856639525 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/make -f
++#export DH_VERBOSE=1
+ 
+ %:
+        dh $@
+@@ -10,3 +11,14 @@
+ 
+ override_dh_compress:
+        dh_compress -X.lua
++
++override_dh_auto_test:
++       @echo "Skipping test step"
++
++override_dh_auto_install:
++       dh_auto_install
++       cp tpcc/tpcc.lua debian/tmp/tpcc.lua
++       cp tpcc/tpcc_check.lua debian/tmp/tpcc_check.lua
++       cp tpcc/tpcc_common.lua debian/tmp/tpcc_common.lua
++       cp tpcc/tpcc_run.lua debian/tmp/tpcc_run.lua
++        
