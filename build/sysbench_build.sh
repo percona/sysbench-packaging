@@ -293,7 +293,7 @@ build_srpm(){
     #
     #bzr branch lp:~percona-core/sysbench/sysbench-packaging
     rm -rf sysbench-packaging
-    git clone https://github.com/percona/sysbench-packaging.git
+    git clone https://github.com/EvgeniyPatlan/sysbench-packaging.git
     #
     cd ${WORKDIR}/rpmbuild/SPECS
     tar vxzf ${WORKDIR}/${TARFILE} --wildcards '*/rpm/sysbench.spec' --strip=2
