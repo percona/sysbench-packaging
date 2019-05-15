@@ -26,19 +26,18 @@
 +#export DH_VERBOSE=1
  
  %:
-        dh $@
-@@ -10,3 +11,14 @@
+ 	dh $@
+@@ -10,3 +11,13 @@
  
  override_dh_compress:
-        dh_compress -X.lua
+ 	dh_compress -X.lua
 +
 +override_dh_auto_test:
-+       @echo "Skipping test step"
++	@echo "Skipping test step"
 +
 +override_dh_auto_install:
-+       dh_auto_install
-+       cp tpcc/tpcc.lua debian/tmp/tpcc.lua
-+       cp tpcc/tpcc_check.lua debian/tmp/tpcc_check.lua
-+       cp tpcc/tpcc_common.lua debian/tmp/tpcc_common.lua
-+       cp tpcc/tpcc_run.lua debian/tmp/tpcc_run.lua
-+        
++	dh_auto_install
++	cp tpcc/tpcc.lua debian/tmp/tpcc.lua
++	cp tpcc/tpcc_check.lua debian/tmp/tpcc_check.lua
++	cp tpcc/tpcc_common.lua debian/tmp/tpcc_common.lua
++	cp tpcc/tpcc_run.lua debian/tmp/tpcc_run.lua

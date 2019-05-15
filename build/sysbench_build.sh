@@ -388,7 +388,7 @@ build_source_deb(){
     #
     tar xzf ${NEWTAR}
     cd ${NAME}-${VERSION}
-    patch -p0 < ${WORKDIR}/sysbench-packaging/debian/debian.patch .
+    patch -p0 < ${WORKDIR}/sysbench-packaging/debian/debian.patch
     dch -D unstable --force-distribution -v "${VERSION}-${DEB_RELEASE}" "Update to new upstream release SysBench ${VERSION}-${DEB_RELEASE}"
     dpkg-buildpackage -S
     #
