@@ -398,10 +398,10 @@ build_source_deb(){
     mkdir -p $CURDIR/source_deb
     cp *_source.changes $WORKDIR/source_deb
     cp *.dsc $WORKDIR/source_deb
-    cp *.tar.gz $WORKDIR/source_deb
+    cp *.tar* $WORKDIR/source_deb
     cp *_source.changes $CURDIR/source_deb
     cp *.dsc $CURDIR/source_deb
-    cp *.tar.gz $CURDIR/source_deb
+    cp *.tar* $CURDIR/source_deb
 }
 
 build_deb(){
@@ -415,7 +415,7 @@ build_deb(){
         echo "It is not possible to build source deb here"
         exit 1
     fi
-    for file in 'dsc' 'orig.tar.gz' 'changes' 'debian.tar.gz'
+    for file in 'dsc' 'orig.tar.gz' 'changes' 'debian.tar.*z'
     do
         get_deb_sources $file
     done
@@ -468,8 +468,8 @@ OS=
 SYSBENCH_BRANCH="master"
 TPC_BRANCH="master"
 INSTALL=0
-RPM_RELEASE=4
-DEB_RELEASE=4
+RPM_RELEASE=5
+DEB_RELEASE=5
 REVISION=0
 TPCC_REPO="https://github.com/Percona-Lab/sysbench-tpcc.git"
 NAME=sysbench

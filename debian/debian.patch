@@ -1,3 +1,15 @@
+--- debian/sysbench.install     1970-01-01 00:00:00.000000000 +0000
++++ debian/sysbench.install     2019-05-27 12:21:05.037733548 +0000
+@@ -0,0 +1,2 @@
++usr/bin/sysbench
++usr/share/sysbench
+--- debian/sysbench-tpcc.install        1970-01-01 00:00:00.000000000 +0000
++++ debian/sysbench-tpcc.install        2019-05-27 12:21:05.037733548 +0000
+@@ -0,0 +1,4 @@
++tpcc.lua /usr/share/sysbench/
++tpcc_check.lua /usr/share/sysbench/
++tpcc_common.lua /usr/share/sysbench/
++tpcc_run.lua /usr/share/sysbench/
 --- debian/control     2019-01-14 09:38:32.598194408 +0200
 +++ debian/control     2019-01-14 09:38:30.878204231 +0200
 @@ -1,7 +1,7 @@
