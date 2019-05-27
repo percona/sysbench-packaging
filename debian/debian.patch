@@ -1,3 +1,15 @@
+--- debian/sysbench.install     1970-01-01 00:00:00.000000000 +0000
++++ debian/sysbench.install     2019-05-27 12:21:05.037733548 +0000
+@@ -0,0 +1,2 @@
++usr/bin/sysbench
++usr/share/sysbench
+--- debian/sysbench-tpcc.install        1970-01-01 00:00:00.000000000 +0000
++++ debian/sysbench-tpcc.install        2019-05-27 12:21:05.037733548 +0000
+@@ -0,0 +1,4 @@
++tpcc.lua /usr/share/sysbench/
++tpcc_check.lua /usr/share/sysbench/
++tpcc_common.lua /usr/share/sysbench/
++tpcc_run.lua /usr/share/sysbench/
 --- debian/control     2019-01-14 09:38:32.598194408 +0200
 +++ debian/control     2019-01-14 09:38:30.878204231 +0200
 @@ -1,7 +1,7 @@
@@ -26,19 +38,18 @@
 +#export DH_VERBOSE=1
  
  %:
-        dh $@
-@@ -10,3 +11,14 @@
+ 	dh $@
+@@ -10,3 +11,13 @@
  
  override_dh_compress:
-        dh_compress -X.lua
+ 	dh_compress -X.lua
 +
 +override_dh_auto_test:
-+       @echo "Skipping test step"
++	@echo "Skipping test step"
 +
 +override_dh_auto_install:
-+       dh_auto_install
-+       cp tpcc/tpcc.lua debian/tmp/tpcc.lua
-+       cp tpcc/tpcc_check.lua debian/tmp/tpcc_check.lua
-+       cp tpcc/tpcc_common.lua debian/tmp/tpcc_common.lua
-+       cp tpcc/tpcc_run.lua debian/tmp/tpcc_run.lua
-+        
++	dh_auto_install
++	cp tpcc/tpcc.lua debian/tmp/tpcc.lua
++	cp tpcc/tpcc_check.lua debian/tmp/tpcc_check.lua
++	cp tpcc/tpcc_common.lua debian/tmp/tpcc_common.lua
++	cp tpcc/tpcc_run.lua debian/tmp/tpcc_run.lua
