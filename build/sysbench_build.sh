@@ -441,6 +441,10 @@ build_deb(){
     if [ ${DEBIAN_VERSION} = "stretch" ]; then
         sed -ie 's/libmysqlclient-dev/default-libmysqlclient-dev/' debian/control
     fi
+    if [ ${DEBIAN_VERSION} = "focal" ]; then
+        sed -ie 's/python/python2/' debian/control
+    fi
+
     dch -b -m -D "$DEBIAN_VERSION" --force-distribution -v "${VERSION}-${DEB_RELEASE}.${DEBIAN_VERSION}" 'Update distribution'
     #
     dpkg-buildpackage -rfakeroot -uc -us -b
