@@ -165,7 +165,7 @@ get_sources(){
     fi 
     #
     echo "DESTINATION=${DESTINATION}" >> sysbench.properties
-    echo "UPLOAD=UPLOAD/builds/${PRODUCT}/${PRODUCT_FULL}/${BRANCH_NAME}/${REVISION}" >> sysbench.properties
+    echo "UPLOAD=UPLOAD/builds/${PRODUCT}/${PRODUCT_FULL}/${BRANCH_NAME}/${REVISION}/${BUILD_ID}" >> sysbench.properties
     #
     tar -zcvf ${NAME}-${VERSION}.tar.gz ${NAME}-${VERSION} --exclude=.bzr* --exclude=.git*
     
