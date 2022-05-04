@@ -12,15 +12,17 @@
 +tpcc_run.lua /usr/share/sysbench/
 --- debian/control     2019-01-14 09:38:32.598194408 +0200
 +++ debian/control     2019-01-14 09:38:30.878204231 +0200
-@@ -1,7 +1,7 @@
+@@ -1,8 +1,8 @@
  Source: sysbench
  Section: misc
  Priority: extra
 -Maintainer: Alexey Kopytov <akopytov@gmail.com>
+-Build-Depends: debhelper, autoconf, automake, libaio-dev, libtool, libmysqlclient-dev | default-libmysqlclient-dev, libpq-dev, pkg-config, python, libssl-dev
 +Maintainer: Percona Development Team <mysql-dev@percona.com>
- Build-Depends: debhelper, autoconf, automake, libaio-dev, libtool, libmysqlclient-dev | default-libmysqlclient-dev, libpq-dev, pkg-config, python
++Build-Depends: debhelper, autoconf, automake, libaio-dev, libtool, libmysqlclient-dev | default-libmysqlclient-dev, libpq-dev, pkg-config, python | python2, libssl-dev
  Standards-Version: 3.9.5
  Homepage: https://github.com/akopytov/sysbench
+ 
 @@ -23,3 +23,9 @@
   - memory: a memory access benchmark
   - threads: a thread-based scheduler benchmark
@@ -33,13 +35,21 @@
 +Description: TPCC tests files for sysbench
 --- debian/rules       2019-01-14 09:32:22.580339049 +0200
 +++ debian/rules       2019-01-14 09:31:31.856639525 +0200
-@@ -1,4 +1,5 @@
+@@ -1,8 +1,13 @@
  #!/usr/bin/make -f
-+#export DH_VERBOSE=1
  
++#export DH_VERBOSE=1
++
  %:
  	dh $@
-@@ -10,3 +11,13 @@
+ 
++override_dh_builddeb:
++	dh_builddeb -- -Zgzip
++
+ override_dh_auto_configure:
+ 	dh_testdir
+ 	autoreconf -vif
+@@ -10,3 +15,13 @@
  
  override_dh_compress:
  	dh_compress -X.lua
