@@ -1,5 +1,7 @@
---- sysbench.spec       2019-01-14 11:05:11.607168441 +0200
-+++ /home/korvin/sys/sysbench-packaging/rpm/sysbench.spec       2019-01-14 10:00:26.006847376 +0200
+diff --git a/rpm/sysbench.spec b/rpm/sysbench.spec
+index cde0fdb..5f08b09 100644
+--- a/rpm/sysbench.spec
++++ b/rpm/sysbench.spec
 @@ -1,12 +1,12 @@
  Summary:       Scriptable database and system performance benchmark
  Name:          sysbench
@@ -15,18 +17,25 @@
  URL:           https://github.com/akopytov/sysbench/
 +BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
  
- %if 0%{?el6}
+ %if 0%{?rhel} < 7
  BuildRequires: mysql-devel
-@@ -22,8 +22,6 @@
- # Use bundled cram for tests
- BuildRequires: python
- 
+@@ -19,15 +19,6 @@ BuildRequires: automake
+ BuildRequires: libtool
+ BuildRequires: pkgconfig
+ BuildRequires: libaio-devel
+-# Use bundled cram for tests
+-%if 0%{?rhel} > 7
+-BuildRequires: python2
+-%else
+-BuildRequires: python
+-%endif
+-
 -ExclusiveArch: %{arm} %{ix86} x86_64 %{mips} aarch64
 -
  
  %description
  sysbench is a scriptable multi-threaded benchmark tool based on
-@@ -40,6 +38,14 @@
+@@ -44,6 +35,14 @@ sysbench comes with the following bundled benchmarks:
  - threads: a thread-based scheduler benchmark
  - mutex: a POSIX mutex benchmark
  
@@ -41,7 +50,7 @@
  %prep
  %setup -q
  
-@@ -57,20 +63,27 @@
+@@ -61,20 +60,27 @@ make -j2
  %endif
  
  %install

@@ -46,7 +46,8 @@ parse_arguments() {
             --build_deb=*) DEB="$val" ;;
             --get_sources=*) SOURCE="$val" ;;
             --branch=*) SYSBENCH_BRANCH="$val" ;;
-            --tpc_branch=*) TPC_BRANCH="$val" ;;
+            --tpcc_branch=*) TPC_BRANCH="$val" ;;
+            --pack_branch=*) PACK_BRANCH="$val" ;;
             --install_deps=*) INSTALL="$val" ;;
             --help) usage ;;      
             *)
@@ -115,7 +116,7 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    git clone https://github.com/akopytov/sysbench.git
+    git clone ${GIT_REPO}
     retval=$?
     if [ $retval != 0 ]
     then
@@ -207,18 +208,60 @@ install_deps() {
     CURPLACE=$(pwd)
     if [ "x$OS" = "xrpm" ]
     then
-        add_percona_yum_repo
+        if [ $RHEL -lt 9 ]; then
+            add_percona_yum_repo
+        else
+            yum -y update
+            yum-config-manager --enable ol9_codeready_builder
+        fi
         yum -y install git wget
         yum -y install epel-release rpmdevtools bison yum-utils
+        yum -y install rpm-build automake libaio-devel libtool make postgresql-devel mariadb-devel
+        if [ $RHEL = 8 ]; then
+            cat /etc/os-release
+            sed -i 's/mirrorlist=/#mirrorlist=/g' /etc/yum.repos.d/CentOS-*
+            sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+            yum -y update
+            sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+            sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        fi
+        if [ $RHEL = 9 ]; then
+            cat /etc/os-release
+            yum -y update
+            yum -y install python3 gnutls-devel libtool || true
+            ln -s /usr/bin/python3.9 /usr/bin/python || true
+        fi
+        if [ $RHEL -lt 9 ]; then
+            wget -O /etc/yum.repos.d/percona-dev.repo http://jenkins.percona.com/yum-repo/percona-dev.repo
+        fi
+        yum -y install automake bzip2 cmake make gcc-c++ gcc git openssl openssl-devel gnutls gnutls-devel libtool patch
+        yum -y install python3 perl-IPC-Cmd libuuid-devel
+        if [ $RHEL -eq 8 ]; then
+            rpm -q centos-release || true
+            rpm -q centos-linux-release || true
+            yum -y install epel-release
+            yum -y install libcurl-devel libunwind libunwind-devel
+        fi
+        if [ $RHEL -lt 8 ]; then
+            yum -y install libunwind libunwind-devel
+            yum -y upgrade
+        fi
+        if [ $RHEL -eq 7 ]; then
+            /usr/bin/python -V
+            head -1 /usr/bin/yum
+        fi
+
         cd $WORKDIR
-        link="https://raw.githubusercontent.com/akopytov/sysbench/master/rpm/sysbench.spec"
+        link="https://raw.githubusercontent.com/akopytov/sysbench/${BRANCH}/rpm/sysbench.spec"
         wget $link
         sed -i 's|x.y.z|1.0|' sysbench.spec
         yum-builddep -y $WORKDIR/$NAME.spec
     else
-        add_percona_apt_repo
-        apt-get update
-        apt-get -y install fakeroot debhelper debconf devscripts equivs libmysqlclient-dev libpq-dev pkg-config
+        apt-get -y update
+        DEBIAN_FRONTEND=noninteractive apt-get -y install git wget curl lsb-release gnupg2 apt-utils
+      #  add_percona_apt_repo
+        apt-get -y update
+        DEBIAN_FRONTEND=noninteractive apt-get -y install fakeroot debhelper debconf devscripts equivs libpq-dev pkg-config
         CURPLACE=$(pwd)
         cd $WORKDIR
         link="https://raw.githubusercontent.com/akopytov/sysbench/master/debian/control"
@@ -226,6 +269,28 @@ install_deps() {
         cd $CURPLACE
         sed -i 's:apt-get :apt-get -y --force-yes :g' /usr/bin/mk-build-deps
         mk-build-deps --install $WORKDIR/control
+        sed -e '/.*backports.*/d' /etc/apt/sources.list > sources.list.new
+        mv -f sources.list.new /etc/apt/sources.list
+
+        export DEBIAN_VERSION="$(lsb_release -sc)"
+        if [ $DEBIAN_VERSION = focal ]; then
+           DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
+        fi
+        if [[ ${DEBIAN_VERSION} = buster ]]; then
+            wget http://ftp.de.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2021.1.1_all.deb
+            apt -y install ./debian-archive-keyring_2021.1.1_all.deb
+            DEBIAN_FRONTEND=noninteractive  apt-get -y update --allow-releaseinfo-change || true
+        fi
+        DEBIAN_FRONTEND=noninteractive apt-get update || true
+        apt-get -y install wget gnupg2 curl
+        wget --no-check-certificate https://jenkins.percona.com/apt-repo/8507EFA5.pub -O - | sudo apt-key add -
+        apt-get -y install dpkg-dev
+        if [ $DEBIAN_VERSION = focal -o $DEBIAN_VERSION = jammy ]; then
+            DEBIAN_FRONTEND=noninteractive apt-get -y install libaio-dev autoconf automake libtool default-libmysqlclient-dev libpq-dev pkg-config python2 build-essential devscripts debconf gcc g++
+        else
+            apt-get -y install dpkg-dev libaio-dev debhelper autoconf automake libtool libssl-dev libpq-dev pkg-config python build-essential devscripts debconf gcc g++
+        fi
+        apt-get -y install default-libmysqlclient-dev || true
     fi
     return;
 }
@@ -293,7 +358,10 @@ build_srpm(){
     #
     #bzr branch lp:~percona-core/sysbench/sysbench-packaging
     rm -rf sysbench-packaging
-    git clone https://github.com/EvgeniyPatlan/sysbench-packaging.git
+    git clone ${GIT_PACK_REPO}
+    cd sysbench-packaging
+    git checkout ${PACK_BRANCH}
+    cd ..
     #
     cd ${WORKDIR}/rpmbuild/SPECS
     tar vxzf ${WORKDIR}/${TARFILE} --wildcards '*/rpm/sysbench.spec' --strip=2
@@ -384,7 +452,10 @@ build_source_deb(){
     #
     #bzr branch lp:~percona-core/sysbench/sysbench-packaging
     rm -rf sysbench-packaging
-    git clone https://github.com/percona/sysbench-packaging.git
+    git clone ${GIT_PACK_REPO}
+    cd sysbench-packaging
+    git checkout ${PACK_BRANCH}
+    cd ..
     #
     tar xzf ${NEWTAR}
     cd ${NAME}-${VERSION}
@@ -469,13 +540,17 @@ TARBALL=0
 OS_NAME=
 ARCH=
 OS=
-SYSBENCH_BRANCH="master"
+SYSBENCH_BRANCH="1.0.20"
 TPC_BRANCH="master"
+BRANCH="1.0.20"
+PACK_BRANCH="main"
 INSTALL=0
 RPM_RELEASE=6
 DEB_RELEASE=6
 REVISION=0
 TPCC_REPO="https://github.com/Percona-Lab/sysbench-tpcc.git"
+GIT_PACK_REPO="https://github.com/percona/sysbench-packaging.git"
+GIT_REPO="https://github.com/akopytov/sysbench.git"
 NAME=sysbench
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
 VERSION=$SYSBENCH_BRANCH
