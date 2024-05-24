@@ -285,7 +285,7 @@ install_deps() {
         apt-get -y install wget gnupg2 curl
         wget --no-check-certificate https://jenkins.percona.com/apt-repo/8507EFA5.pub -O - | sudo apt-key add -
         apt-get -y install dpkg-dev
-        if [ $DEBIAN_VERSION = focal -o $DEBIAN_VERSION = jammy ]; then
+        if [ $DEBIAN_VERSION = focal -o $DEBIAN_VERSION = jammy -o $DEBIAN_VERSION = noble ]; then
             DEBIAN_FRONTEND=noninteractive apt-get -y install libaio-dev autoconf automake libtool default-libmysqlclient-dev libpq-dev pkg-config python2 build-essential devscripts debconf gcc g++
         else
             apt-get -y install dpkg-dev libaio-dev debhelper autoconf automake libtool libssl-dev libpq-dev pkg-config python build-essential devscripts debconf gcc g++
@@ -515,6 +515,9 @@ build_deb(){
     if [ ${DEBIAN_VERSION} = "focal" -o ${DEBIAN_VERSION} = "jammy" ]; then
         sed -ie 's/python/python2/' debian/control
     fi
+    if [ ${DEBIAN_VERSION} = "noble" ]; then
+        sed -ie 's/python/python3/' debian/control
+    fi
 
     dch -b -m -D "$DEBIAN_VERSION" --force-distribution -v "${VERSION}-${DEB_RELEASE}.${DEBIAN_VERSION}" 'Update distribution'
     #
@@ -545,8 +548,8 @@ TPC_BRANCH="master"
 BRANCH="1.0.20"
 PACK_BRANCH="main"
 INSTALL=0
-RPM_RELEASE=6
-DEB_RELEASE=6
+RPM_RELEASE=8
+DEB_RELEASE=8
 REVISION=0
 TPCC_REPO="https://github.com/Percona-Lab/sysbench-tpcc.git"
 GIT_PACK_REPO="https://github.com/percona/sysbench-packaging.git"
