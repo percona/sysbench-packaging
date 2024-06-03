@@ -76,36 +76,13 @@ check_workdir(){
 }
 
 add_percona_yum_repo(){
-    if [ ! -f /etc/yum.repos.d/percona-dev.repo ]
-    then
-        cat >/etc/yum.repos.d/percona-dev.repo <<EOL
-[percona-dev-$basearch]
-name=Percona internal YUM repository for build slaves \$releasever - \$basearch
-baseurl=http://jenkins.percona.com/yum-repo/\$releasever/RPMS/\$basearch
-gpgkey=http://jenkins.percona.com/yum-repo/PERCONA-PACKAGING-KEY
-gpgcheck=0
-enabled=1
 
-[percona-dev-noarch]
-name=Percona internal YUM repository for build slaves \$releasever - noarch
-baseurl=http://jenkins.percona.com/yum-repo/\$releasever/RPMS/noarch
-gpgkey=http://jenkins.percona.com/yum-repo/PERCONA-PACKAGING-KEY
-gpgcheck=0
-enabled=1
-EOL
-    fi
+    echo "we do not need additional repo"
     return
 }
 
 add_percona_apt_repo(){
-    if [ ! -f /etc/apt/sources.list.d/percona-dev.list ]
-    then
-        cat >/etc/apt/sources.list.d/percona-dev.list <<EOL
-deb http://jenkins.percona.com/apt-repo/ @@DIST@@ main
-deb-src http://jenkins.percona.com/apt-repo/ @@DIST@@ main
-EOL
-    sed -i "s:@@DIST@@:$OS_NAME:g" /etc/apt/sources.list.d/percona-dev.list
-    fi
+    echo "we don't need additional repo"
     return
 }
 
@@ -231,9 +208,9 @@ install_deps() {
             yum -y install python3 gnutls-devel libtool || true
             ln -s /usr/bin/python3.9 /usr/bin/python || true
         fi
-        if [ $RHEL -lt 9 ]; then
-            wget -O /etc/yum.repos.d/percona-dev.repo http://jenkins.percona.com/yum-repo/percona-dev.repo
-        fi
+        #if [ $RHEL -lt 9 ]; then
+        #    wget -O /etc/yum.repos.d/percona-dev.repo http://jenkins.percona.com/yum-repo/percona-dev.repo
+        #fi
         yum -y install automake bzip2 cmake make gcc-c++ gcc git openssl openssl-devel gnutls gnutls-devel libtool patch
         yum -y install python3 perl-IPC-Cmd libuuid-devel
         if [ $RHEL -eq 8 ]; then
@@ -283,7 +260,7 @@ install_deps() {
         fi
         DEBIAN_FRONTEND=noninteractive apt-get update || true
         apt-get -y install wget gnupg2 curl
-        wget --no-check-certificate https://jenkins.percona.com/apt-repo/8507EFA5.pub -O - | sudo apt-key add -
+        #wget --no-check-certificate https://jenkins.percona.com/apt-repo/8507EFA5.pub -O - | sudo apt-key add -
         apt-get -y install dpkg-dev
         if [ $DEBIAN_VERSION = focal -o $DEBIAN_VERSION = jammy -o $DEBIAN_VERSION = noble ]; then
             DEBIAN_FRONTEND=noninteractive apt-get -y install libaio-dev autoconf automake libtool default-libmysqlclient-dev libpq-dev pkg-config python2 build-essential devscripts debconf gcc g++
