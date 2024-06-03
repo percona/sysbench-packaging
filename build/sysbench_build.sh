@@ -263,10 +263,18 @@ install_deps() {
         #wget --no-check-certificate https://jenkins.percona.com/apt-repo/8507EFA5.pub -O - | sudo apt-key add -
         apt-get -y install dpkg-dev
         if [ $DEBIAN_VERSION = focal -o $DEBIAN_VERSION = jammy -o $DEBIAN_VERSION = noble ]; then
-            DEBIAN_FRONTEND=noninteractive apt-get -y install libaio-dev autoconf automake libtool default-libmysqlclient-dev libpq-dev pkg-config python2 build-essential devscripts debconf gcc g++
+            DEBIAN_FRONTEND=noninteractive apt-get -y install libaio-dev autoconf automake libtool default-libmysqlclient-dev libpq-dev pkg-config build-essential devscripts debconf gcc g++
         else
-            apt-get -y install dpkg-dev libaio-dev debhelper autoconf automake libtool libssl-dev libpq-dev pkg-config python build-essential devscripts debconf gcc g++
+            apt-get -y install dpkg-dev libaio-dev debhelper autoconf automake libtool libssl-dev libpq-dev pkg-config build-essential devscripts debconf gcc g++
         fi
+        if [ $DEBIAN_VERSION = focal -o $DEBIAN_VERSION = jammy -o $DEBIAN_VERSION = noble ]; then
+            DEBIAN_FRONTEND=noninteractive apt-get -y install python2
+        elif [ $DEBIAN_VERSION = noble ]; then
+            DEBIAN_FRONTEND=noninteractive apt-get -y install python3
+        else
+            DEBIAN_FRONTEND=noninteractive apt-get -y install python
+        fi    
+
         apt-get -y install default-libmysqlclient-dev || true
     fi
     return;
