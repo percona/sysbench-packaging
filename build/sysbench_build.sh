@@ -489,7 +489,7 @@ build_deb(){
     if [ ${DEBIAN_VERSION} = "stretch" ]; then
         sed -ie 's/libmysqlclient-dev/default-libmysqlclient-dev/' debian/control
     fi
-    if [ ${DEBIAN_VERSION} = "focal" -o ${DEBIAN_VERSION} = "jammy" -o ${DEBIAN_VERSION} = "noble" ]; then
+    if [ ${DEBIAN_VERSION} = "focal" -o ${DEBIAN_VERSION} = "jammy" ]; then
         sed -ie 's/python/python2/' debian/control
     fi
     if [ ${DEBIAN_VERSION} = "noble" ]; then
