@@ -197,17 +197,31 @@ install_deps() {
     then
         yum install -y https://repo.percona.com/yum/percona-release-latest.noarch.rpm
         yum module disable -y mysql
-        percona-release enable ps-80 release
+        if [ $RHEL = 10 ]; then
+            percona-release enable ps-84-lts release
+        else
+            percona-release enable ps-80 release
+        fi
         if [ $RHEL -lt 9 ]; then
             add_percona_yum_repo
             yum-config-manager --enable ol8_codeready_builder
         else
             yum -y update
-            yum-config-manager --enable ol9_codeready_builder
+            yum-config-manager --enable ol${RHEL}_codeready_builder
         fi
         yum -y install git wget
         yum -y install epel-release rpmdevtools bison yum-utils
         yum -y install rpm-build automake libaio-devel libtool make postgresql-devel percona-server-shared percona-server-devel
+        if [ $RHEL = 10 ]; then
+            yum -y install oracle-epel-release-el10
+        else
+            yum -y install epel-release
+        fi
+        yum -y install rpmdevtools bison yum-utils
+        yum -y install rpm-build automake libaio-devel libtool make postgresql-devel percona-server-shared percona-server-devel
+        if [ $RHEL = 10 ]; then
+            yum -y install postgresql-server-devel
+        fi
         if [ $RHEL = 8 ]; then
             cat /etc/os-release
             sed -i 's/mirrorlist=/#mirrorlist=/g' /etc/yum.repos.d/CentOS-*
@@ -216,7 +230,7 @@ install_deps() {
             sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
             sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
         fi
-        if [ $RHEL = 9 ]; then
+        if [ $RHEL -ge 9 ]; then
             cat /etc/os-release
             yum -y update
             yum -y install python3 gnutls-devel libtool || true
