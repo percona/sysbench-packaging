@@ -260,13 +260,22 @@ install_deps() {
         apt-get -y update
         DEBIAN_FRONTEND=noninteractive apt-get -y install git wget curl lsb-release gnupg2 apt-utils
       #  add_percona_apt_repo
+        export DEBIAN_VERSION="$(lsb_release -sc)"
         wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
         dpkg -i percona-release_latest.generic_all.deb
         rm -f percona-release_latest.generic_all.deb
-        percona-release enable ps-80 release
-        percona-release enable ppg-16 release
+        if [ $DEBIAN_VERSION = trixie ]; then
+            percona-release enable ps-84-lts release
+        else
+            percona-release enable ps-80 release
+        fi
         apt-get -y update
-        DEBIAN_FRONTEND=noninteractive apt-get -y install fakeroot debhelper debconf devscripts equivs libpq-dev pkg-config libperconaserverclient21-dev
+        DEBIAN_FRONTEND=noninteractive apt-get -y install fakeroot debhelper debconf devscripts equivs libpq-dev pkg-config
+        if [ $DEBIAN_VERSION = trixie ]; then
+            DEBIAN_FRONTEND=noninteractive apt-get -y install libperconaserverclient22-dev
+        else
+            DEBIAN_FRONTEND=noninteractive apt-get -y install libperconaserverclient21-dev
+        fi
         CURPLACE=$(pwd)
         cd $WORKDIR
         sed -i 's:apt-get :apt-get -y --force-yes :g' /usr/bin/mk-build-deps
@@ -291,9 +300,9 @@ install_deps() {
         else
             apt-get -y install dpkg-dev libaio-dev debhelper autoconf automake libtool libssl-dev  pkg-config build-essential devscripts debconf gcc g++
         fi
-        if [ $DEBIAN_VERSION = focal -o $DEBIAN_VERSION = jammy -o $DEBIAN_VERSION = noble ]; then
+        if [ $DEBIAN_VERSION = focal -o $DEBIAN_VERSION = jammy ]; then
             DEBIAN_FRONTEND=noninteractive apt-get -y install python2
-        elif [ $DEBIAN_VERSION = noble ]; then
+        elif [ $DEBIAN_VERSION = noble -o $DEBIAN_VERSION = bookworm -o $DEBIAN_VERSION = trixie ]; then
             DEBIAN_FRONTEND=noninteractive apt-get -y install python3
         else
             DEBIAN_FRONTEND=noninteractive apt-get -y install python
@@ -510,7 +519,7 @@ build_deb(){
     if [ ${DEBIAN_VERSION} = "focal" -o ${DEBIAN_VERSION} = "jammy" ]; then
         sed -ie 's/python/python2/' debian/control
     fi
-    if [ ${DEBIAN_VERSION} = "noble" ]; then
+    if [ ${DEBIAN_VERSION} = "noble" -o ${DEBIAN_VERSION} = "bookworm" -o ${DEBIAN_VERSION} = "trixie" ]; then
         sed -ie 's/python/python3/' debian/control
     fi
 
